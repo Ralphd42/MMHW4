@@ -1,6 +1,8 @@
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.*;
 
+import javax.imageio.ImageIO;
 public class SSS_Demo {
 	static final int k=2;
 	static final int p = 251;
@@ -17,19 +19,19 @@ public class SSS_Demo {
 			{
 				int rgb = img.getRGB(wcnt, hcnt);
 				//break into componets using bit manipulations similar to stegnaography hmwk
-				int alpha = (rgb>>24)&0xff;
+				//int alpha = (rgb>>24)&0xff; not needed will be 255 for greyscale
 				int red   = ( rgb>>16)&0xff;
 				int green  = ( rgb >>8)&0xff;
 				int blue =  rgb & 0xff;
 				// get avg 
-				int av =(red+ green+blue)/3;
-				if( av>250)
+				int average =(red+ green+blue)/3;
+				if( average>250)
 				{
-					av=250;
+					average=250;
 				}
 				// rebuild color
-				rgb = (255<<24)|(avg<<16)|(avg<<8)|(avg);
-				img.setRGB(wcnt, y, rgb);
+				rgb = (255<<24)|(average<<16)|(average<<8)|(average);
+				img.setRGB(wcnt, hcnt, rgb);
 			}
 		}
 	}
@@ -41,16 +43,17 @@ public class SSS_Demo {
 		
 		*/
 		// formula k=2
+		// were using squre images
 		int imght    =Secret.getHeight();
-		int imgWidth = Secret.getWidth();		
+		//int imgWidth = Secret.getWidth();		
 
-		int maxval = Math.floor(imght/k);
+		int maxval = (int)Math.floor(imght/k);
 		for( int j=0;j<maxval;j++)
 		{
 			for( int i=0;i<maxval;i++)
 			{
 				int s      = Secret.getRGB((i*k +1), j) & 0xff;// since it is a greyscale image just use blue
-				int coeff  = sharenum * (Secret.getRGB((i*k +1), j) & 0xff);
+				int coeff  = shareNum * (Secret.getRGB((i*k +1), j) & 0xff);
 				int newval = (s + coeff)%p;
 				int rgb = (255<<24)|(newval<<16)|(newval<<8)|(newval);
 				share.setRGB(i, j, rgb);
@@ -69,14 +72,14 @@ public class SSS_Demo {
 		BufferedImage inputImg =null;
 		try
 		{
-			File inputFile =new FIle( args[0]);
-			inputImg= ImageIO.read(inputfile);
+			File inputFile =new File( args[0]);
+			inputImg= ImageIO.read(inputFile);
 
 		}catch(IOException ioe)
 		{
 			
 			System.out.println(ioe);
-			exit(1);
+			System.exit(1);
 		}
 		// make greyscale
 		
