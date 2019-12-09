@@ -61,14 +61,71 @@ public class SSS_Demo {
 		}
 	}
 
+	void RebuildImage( BufferedImage [] shares,  BufferedImage reconstructed)
+	{
+		int hghtWdth = shares[0].getWidth();
+		for( int h=0; h<hghtWdth;++h)
+		{
+			for ( int w=0;w<hghtWdth;++w)
+			{
+				SSS s = new SSS(2,2,p);
+				Point[] parr = new Point[2];
+				for(int cntSh =0;cntSh<shares.length;++cntSh)
+				{
+					int im1val = shares[cntSh].getRGB(w, h);
+					parr[cntSh] =new Point(cntSh+1,     im1val);					
+				}
+				int recval =s.reconstruct(parr, p);
+				//call function with point Array
+				reconstructed.setRGB(w, h, recval);
+			}
+		}
+	}
+
+	static void   SubtractImagesGS(BufferedImage img1, BufferedImage img2)
+	{
+		BufferedImage newimg = new BufferedImage( img1.getWidth(),img2.getHeight(),BufferedImage.TYPE_INT_RGB );
+		for(int hcnt = 0; hcnt < img1.getHeight(); ++hcnt)
+		{
+			for(int wcnt =0; wcnt < img1.getHeight(); ++ wcnt)
+			{
+				int px1 = img1.getRGB(wcnt,hcnt);
+				int px2 =img1.getRGB(wcnt,hcnt);
+				int diff = getPixelDifferenceGS(px1,px2);
+
+				newimg.setRGB(wcnt,hcnt,diff);
+
+
+
+			}
+		}
+
+		ImageIO.write(newimg,"bmp", new File(""));
 
 
 
 
+
+	}
+	/***
+	 *  gets the greyscale pixel difference 
+	 * @param px1 main pixel
+	 * @param px2 pixel to subtract
+	 * @return piexel value
+	 */
+	public static int getPixelDifferenceGS( int px1, int px2)
+	{
+		int p1Blue = px1  & 0xFF;
+		int p2Blue = px2  & 0xFF;
+		int diff1chan = Math.abs(p1Blue-p2Blue);
+		int diff = (255 << 24) | (diff1chan << 16) | (diff1chan << 8) | diff1chan;
+		return diff;
+	}
 
 
 	public static void main(String[] args) {
 		// load an image
+
 		BufferedImage inputImg =null;
 		try
 		{
@@ -82,9 +139,11 @@ public class SSS_Demo {
 			System.exit(1);
 		}
 		// make greyscale
-		
+		GreyScaleImgMx250(inputImg);
+		int maxval = (int)Math.floor(inputImg.getWidth()/k);
 
-
+		BufferedImage S1 = new BufferedImage(maxval,maxval, BufferedImage.TYPE_INT_RGB);
+		BufferedImage S2 = new BufferedImage(maxval,maxval, BufferedImage.TYPE_INT_RGB);
 
 
 
